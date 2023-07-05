@@ -38,7 +38,8 @@ export const handler = async(event) => {
                            },
                            statusCallback: statusCallback,
                            format: 'mp4',
-                           roomSid: roomSid
+                           roomSid: roomSid,
+                           xTwilioWebhookEnabled: true
                          })
                          .then(handleSuccess)
                          .catch(handleError);

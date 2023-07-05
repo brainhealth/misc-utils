@@ -1,8 +1,8 @@
-const axios = require("axios");
-const AWS = require("aws-sdk");
-const { PassThrough } = require("stream");
+import { default as axios } from 'axios';
+import { S3Client } from '@aws-sdk/client-s3';
+import { PassThrough } from 'stream';
 
-const s3 = new AWS.S3();
+const s3 = new S3Client();
 
 const bucket = process.env.BUCKET_NAME;
 const key = 'new UUID';
@@ -18,7 +18,7 @@ const handleError = (error) => {
   console.error(error);
   return {
     statusCode: 504,
-    body: JSON.stringify(error)
+    body: JSON.stringify(error.message)
   }
 }
 
@@ -46,6 +46,7 @@ export const handler = async(event) => {
   console.log(event);
   const url = event.url;
 
-  const response = await uploadToS3(url, bucket, key);
+  //const response = await uploadToS3(url, bucket, key);
+  response = handleSuccess(event);
   return response;
 };
