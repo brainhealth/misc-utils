@@ -1,11 +1,11 @@
-import {default as twilio} from 'twilio';
+import { default as twilio } from 'twilio';
 
 const handleSuccess = (data) => {
   console.log(data);
   return {
-    statusCode: 200,
+    statusCode: 201,
     body: JSON.stringify({
-      status: 'completed',
+      status: 'enqueued',
       compositionJob: data.sid
     }),
   };
@@ -22,7 +22,7 @@ const handleError = (error) => {
   }
 }
 
-export const handler = async(event) => {
+export const handler = async (event) => {
 
   console.log(event);
   const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -38,36 +38,35 @@ export const handler = async(event) => {
   console.log(roomSid ? roomSid : uniqueName)
 
   let room;
-  if (roomSid)
-    {
-      room = await client.video.v1.rooms(roomSid)
-                           .fetch()
-                           .catch(handleError);
-    }
+  if (roomSid) {
+    room = await client.video.v1.rooms(roomSid)
+      .fetch()
+      .catch(handleError);
+  }
   else {
     const rooms = await client.video.v1//.rooms(encodeURIComponent(roomSid ? roomSid : uniqueName))
-                              .rooms.list({
-                                unique_name: uniqueName
-                              })
-                              .catch(handleError);
+      .rooms.list({
+        unique_name: uniqueName
+      })
+      .catch(handleError);
     if (rooms.length > 0) {
       room = rooms[0];
     }
   }
 
-  if (!room){
-    return handleError('could not find room')
+  if (!room) {
+    return {
+      statusCode: 404,
+      body JSON.stringify({
+        status: 'room-not-found'
+      })
+    }
   }
   else if (room?.statusCode) {
     return room;
   }
   else if (room.sid === 'failed') {
-    return {
-      statusCode: 504,
-      body: JSON.stringify({
-        status: 'failed'
-      })
-    };
+    return handleError(room);
   }
   else if (room.sid === 'in-progress') {
     return {
@@ -79,22 +78,22 @@ export const handler = async(event) => {
   }
   else {
     // room status is completed
-      const response = await client.video.v1.compositions
-                                 .create({
-                                   audioSources: ['*'],
-                                   videoLayout: {
-                                     grid: {
-                                       video_sources: [
-                                         '*'
-                                       ]
-                                     }
-                                   },
-                                   statusCallback: statusCallback,
-                                   format: 'mp4',
-                                   roomSid: roomSid
-                                 })
-                                 .then(handleSuccess)
-                                 .catch(handleError);
+    const response = await client.video.v1.compositions
+      .create({
+        audioSources: ['*'],
+        videoLayout: {
+          grid: {
+            video_sources: [
+              '*'
+            ]
+          }
+        },
+        statusCallback: statusCallback,
+        format: 'mp4',
+        roomSid: roomSid
+      })
+      .then(handleSuccess)
+      .catch(handleError);
     return response;
   }
 };
