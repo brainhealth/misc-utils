@@ -46,10 +46,10 @@ export const handler = async(event) => {
     }
   else {
     const rooms = await client.video.v1//.rooms(encodeURIComponent(roomSid ? roomSid : uniqueName))
-                           rooms.list({
-                             uniqueName: uniqueName
-                           })
-                           .catch(handleError);
+                              .rooms.list({
+                                unique_name: uniqueName
+                              })
+                              .catch(handleError);
     if (rooms.length > 0) {
       room = rooms[0];
     }
