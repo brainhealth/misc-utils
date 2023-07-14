@@ -90,7 +90,7 @@ export const handler = async (event) => {
         },
         statusCallback: statusCallback,
         format: 'mp4',
-        roomSid: roomSid
+        roomSid: room.sid
       })
       .then(handleSuccess)
       .catch(handleError);
