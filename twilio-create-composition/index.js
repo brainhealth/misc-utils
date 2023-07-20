@@ -39,18 +39,28 @@ export const handler = async (event) => {
   if (roomSid) {
     console.log("retrieving room via roomSid: " + roomSid);
     room = await client.video.v1.rooms(roomSid)
-      .fetch()
-      .catch(handleError);
+                       .fetch()
+                       .catch(handleError);
   }
   else {
     console.log("retrieving room via uniqueName: " + uniqueName);
     const rooms = await client.video.v1
-      .rooms.list({
-        unique_name: uniqueName
-      })
-      .catch(handleError);
+                              .rooms.list({
+                                uniqueName: uniqueName,
+                                status: 'completed',
+                              })
+                              .catch(handleError);
     if (rooms.length > 0) {
       room = rooms[0];
+    }
+    else {
+      const inProgressRooms = await client.video.v1
+                                          .rooms.list({
+                                            uniqueName: uniqueName,
+                                            status: 'in-progress',
+                                          })
+                                          .catch(handleError);
+      if (inProgressRooms.length > 0) room = inProgressRooms[0];
     }
   }
 
@@ -79,21 +89,21 @@ export const handler = async (event) => {
   else {
     // room status is completed
     const response = await client.video.v1.compositions
-      .create({
-        audioSources: ['*'],
-        videoLayout: {
-          grid: {
-            video_sources: [
-              '*'
-            ]
-          }
-        },
-        statusCallback: statusCallback,
-        format: 'mp4',
-        roomSid: room.sid
-      })
-      .then(handleSuccess)
-      .catch(handleError);
+                                 .create({
+                                   audioSources: ['*'],
+                                   videoLayout: {
+                                     grid: {
+                                       video_sources: [
+                                         '*'
+                                       ]
+                                     }
+                                   },
+                                   statusCallback: statusCallback,
+                                   format: 'mp4',
+                                   roomSid: room.sid
+                                 })
+                                 .then(handleSuccess)
+                                 .catch(handleError);
     return response;
   }
 };
