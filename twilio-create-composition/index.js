@@ -44,7 +44,7 @@ export const handler = async (event) => {
       .catch(handleError);
   }
   else {
-    const rooms = await client.video.v1//.rooms(encodeURIComponent(roomSid ? roomSid : uniqueName))
+    const rooms = await client.video.v1
       .rooms.list({
         unique_name: uniqueName
       })
@@ -57,7 +57,7 @@ export const handler = async (event) => {
   if (!room) {
     return {
       statusCode: 404,
-      body JSON.stringify({
+      body: JSON.stringify({
         status: 'room-not-found'
       })
     }
@@ -65,10 +65,10 @@ export const handler = async (event) => {
   else if (room?.statusCode) {
     return room;
   }
-  else if (room.sid === 'failed') {
+  else if (room.status === 'failed') {
     return handleError(room);
   }
-  else if (room.sid === 'in-progress') {
+  else if (room.status === 'in-progress') {
     return {
       statusCode: 425,
       body: JSON.stringify({
