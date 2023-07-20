@@ -35,15 +35,15 @@ export const handler = async (event) => {
   const roomSid = event.roomSid;
   const uniqueName = event.uniqueName;
 
-  console.log(roomSid ? roomSid : uniqueName)
-
   let room;
   if (roomSid) {
+    console.log("retrieving room via roomSid: " + roomSid);
     room = await client.video.v1.rooms(roomSid)
       .fetch()
       .catch(handleError);
   }
   else {
+    console.log("retrieving room via uniqueName: " + uniqueName);
     const rooms = await client.video.v1
       .rooms.list({
         unique_name: uniqueName
