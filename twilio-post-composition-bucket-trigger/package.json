@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "dependencies": {
+    "twilio": "^4.11.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.45.0"
+  }
+}
