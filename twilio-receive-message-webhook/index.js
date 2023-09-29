@@ -23,9 +23,6 @@ export const handler = async (event) => {
   if (bodyDict['Body'].toUpperCase().includes("YES") || bodyDict['Body'].toUpperCase().includes("BRAIN")) {
     response.message("You are now opted in to receive event communications from CBH! We're excited to have you on this journey with us! STOP at any time to stop receiving messages.");
   }
-  else if (bodyDict['Body'].toUpperCase().includes("STOP")) {
-    response.message("You are now opted out of receive event communications from CBH!");
-  }
 
   console.log(response.toString());
 
