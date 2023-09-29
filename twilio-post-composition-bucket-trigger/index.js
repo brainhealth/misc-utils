@@ -22,7 +22,10 @@ const handleError = () => {
 const getComposition = (compositionId) =>
       client.video.v1.compositions(compositionId).fetch();
 const getRecordings = (composition) =>
-      client.video.v1.recordings.list({groupingSid: [composition.room_sid]});
+      client.video.v1.recordings.list({
+        groupingSid: [composition.roomSid],
+        limit: 50
+      });
 
 const deleteRecordings = (recordings) =>
       Promise.all(
@@ -41,16 +44,25 @@ const checkForErrors = (results) => {
   else return {'status' : 'succeeded'};
 }
 
+const splitAndGetLast = (string, splitOn) => {
+  const vals = string.split(splitOn);
+  return vals[vals.length -1];
+}
+
 export const handler = async (event) => {
   console.log(event);
 
   // get object Ids and make sure
   const records = event.Records;
   const compositionIds = records
-        .map((record) => record.object.key)
-        .map((key) => key.split('/')[-1])
-        .filter((key) => key.split('.')[-1] != "txt")
+        .map((record) => record.s3.object.key)
+        .map((key) => splitAndGetLast(key, '/'))
+        .filter((key) => splitAndGetLast(key, '.') != "txt")
         .map((id) => id.split('.')[0]);
+
+  console.log('compositionIds');
+  console.log(compositionIds);
+
 
   const results = await Promise.all(
     compositionIds.map((compositionId) =>
